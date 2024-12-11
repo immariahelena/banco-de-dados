@@ -237,7 +237,6 @@ quantidade = VALUES(quantidade);
 
 INSERT INTO pedido_produto_acompanhamento (id_pedido_produto, id_acompanhamento)
 VALUES (1, 1), (1, 2), (2, 3) 
-AS t
 ON DUPLICATE KEY UPDATE id_acompanhamento = t.id_acompanhamento;
 
 
