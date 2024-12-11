@@ -239,3 +239,100 @@ INSERT INTO pedido_produto_acompanhamento (id_pedido_produto, id_acompanhamento)
 VALUES (1, 1), (1, 2), (2, 3) 
 AS t
 ON DUPLICATE KEY UPDATE id_acompanhamento = t.id_acompanhamento;
+
+
+SELECT p.nome AS produto, SUM(pp.quantidade) AS total_vendido
+FROM pedido_produto pp
+INNER JOIN produto p ON pp.id_produto = p.produto_id
+GROUP BY p.nome
+ORDER BY total_vendido DESC
+LIMIT 1;
+
+
+SELECT 
+    p.nome AS produto, 
+    SUM(pp.quantidade) AS total_vendido
+FROM 
+    pedido_produto pp
+INNER JOIN 
+    produto p ON pp.id_produto = p.id_produto
+GROUP BY 
+    p.nome
+ORDER BY 
+    total_vendido ASC
+LIMIT 1;
+
+SELECT 
+    MONTH(ped.dataPedido) AS mes, 
+    COUNT(ped.id_pedido) AS total_pedidos
+FROM 
+    pedido ped
+GROUP BY 
+    mes
+ORDER BY 
+    total_pedidos DESC
+LIMIT 1;
+
+SELECT 
+    fp.forma_pagamento, 
+    COUNT(p.id_forma_pagamento) AS total_usos
+FROM 
+    pedido p
+INNER JOIN 
+    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
+GROUP BY 
+    fp.forma_pagamento
+ORDER BY 
+    total_usos DESC
+LIMIT 1;
+
+SELECT 
+    e.rua, 
+    e.bairro, 
+    COUNT(p.id_endereco) AS total_entregas
+FROM 
+    pedido p
+INNER JOIN 
+    endereco e ON p.id_endereco = e.id_endereco
+GROUP BY 
+    e.rua, e.bairro
+ORDER BY 
+    total_entregas DESC
+LIMIT 1;
+
+SELECT 
+    pp.id_pedido, 
+    COUNT(pp.id_produto) AS total_produtos
+FROM 
+    pedido_produto pp
+GROUP BY 
+    pp.id_pedido
+ORDER BY 
+    total_produtos DESC
+LIMIT 1;
+
+SELECT 
+    fp.forma_pagamento, 
+    SUM(p.valor) AS total_vendas
+FROM 
+    pedido p
+INNER JOIN 
+    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
+WHERE 
+    MONTH(p.dataPedido) = MONTH(CURRENT_DATE)
+    AND YEAR(p.dataPedido) = YEAR(CURRENT_DATE)
+GROUP BY 
+    fp.forma_pagamento;
+
+SELECT 
+    fp.forma_pagamento, 
+    SUM(p.valor) AS total_vendas
+FROM 
+    pedido p
+INNER JOIN 
+    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
+WHERE 
+    MONTH(p.dataPedido) = MONTH(CURRENT_DATE) - 1
+    AND YEAR(p.dataPedido) = YEAR(CURRENT_DATE)
+GROUP BY 
+    fp.forma_pagamento;
