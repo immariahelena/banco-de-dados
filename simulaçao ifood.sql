@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS restaurante_pagamento (
     FOREIGN KEY (id_forma_pagamento) REFERENCES forma_pagamento(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS  pedido (
+CREATE TABLE IF NOT EXISTS pedido (
     id INT AUTO_INCREMENT PRIMARY KEY,
     data_pedido DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_restaurante INT NOT NULL,
@@ -216,54 +216,9 @@ ON DUPLICATE KEY UPDATE
     status_entrega = VALUES(status_entrega);
 
 
-INSERT INTO pedido (data_Pedido, id_restaurante, valor, taxaEntrega, id_promocao, id_forma_pagamento, observacoes, troco, id_status_entrega, id_endereco) VALUES
-('2024-12-01', 1, 55.00, 5.00, 1, 1, 'Sem cebola', 10.00, 1, 1),
-('2024-12-02', 2, 20.00, 5.00, 2, 2, 'Entregar rápido', 0.00, 2, 2),
-('2024-12-03', 3, 40.00, 10.00, NULL, 3, 'Sem picles', 0.00, 3, 3)
-ON DUPLICATE KEY UPDATE
-valor = VALUES(valor),
-taxaEntrega = VALUES(taxaEntrega),
-observacoes = VALUES(observacoes),
-troco = VALUES(troco),
-id_status_entrega = VALUES(id_status_entrega),
-id_endereco = VALUES(id_endereco);
-
-INSERT INTO pedido_produto (id_pedido, id_produto, quantidade) VALUES
-(1, 1, 2),
-(1, 2, 1),
-(2, 3, 1)
-ON DUPLICATE KEY UPDATE
-quantidade = VALUES(quantidade);
-
-INSERT INTO pedido_produto_acompanhamento (id_pedido_produto, id_acompanhamento)
-VALUES (1, 1), (1, 2), (2, 3) 
-ON DUPLICATE KEY UPDATE id_acompanhamento = t.id_acompanhamento;
-
-
-SELECT p.nome AS produto, SUM(pp.quantidade) AS total_vendido
-FROM pedido_produto pp
-INNER JOIN produto p ON pp.id_produto = p.produto_id
-GROUP BY p.nome
-ORDER BY total_vendido DESC
-LIMIT 1;
-
-
 SELECT 
-    p.nome AS produto, 
-    SUM(pp.quantidade) AS total_vendido
-FROM 
-    pedido_produto pp
-INNER JOIN 
-    produto p ON pp.id_produto = p.id_produto
-GROUP BY 
-    p.nome
-ORDER BY 
-    total_vendido ASC
-LIMIT 1;
-
-SELECT 
-    MONTH(ped.dataPedido) AS mes, 
-    COUNT(ped.id_pedido) AS total_pedidos
+    MONTH(ped.data_pedido) AS mes, 
+    COUNT(ped.id) AS total_pedidos
 FROM 
     pedido ped
 GROUP BY 
@@ -271,67 +226,3 @@ GROUP BY
 ORDER BY 
     total_pedidos DESC
 LIMIT 1;
-
-SELECT 
-    fp.forma_pagamento, 
-    COUNT(p.id_forma_pagamento) AS total_usos
-FROM 
-    pedido p
-INNER JOIN 
-    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
-GROUP BY 
-    fp.forma_pagamento
-ORDER BY 
-    total_usos DESC
-LIMIT 1;
-
-SELECT 
-    e.rua, 
-    e.bairro, 
-    COUNT(p.id_endereco) AS total_entregas
-FROM 
-    pedido p
-INNER JOIN 
-    endereco e ON p.id_endereco = e.id_endereco
-GROUP BY 
-    e.rua, e.bairro
-ORDER BY 
-    total_entregas DESC
-LIMIT 1;
-
-SELECT 
-    pp.id_pedido, 
-    COUNT(pp.id_produto) AS total_produtos
-FROM 
-    pedido_produto pp
-GROUP BY 
-    pp.id_pedido
-ORDER BY 
-    total_produtos DESC
-LIMIT 1;
-
-SELECT 
-    fp.forma_pagamento, 
-    SUM(p.valor) AS total_vendas
-FROM 
-    pedido p
-INNER JOIN 
-    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
-WHERE 
-    MONTH(p.dataPedido) = MONTH(CURRENT_DATE)
-    AND YEAR(p.dataPedido) = YEAR(CURRENT_DATE)
-GROUP BY 
-    fp.forma_pagamento;
-
-SELECT 
-    fp.forma_pagamento, 
-    SUM(p.valor) AS total_vendas
-FROM 
-    pedido p
-INNER JOIN 
-    forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
-WHERE 
-    MONTH(p.dataPedido) = MONTH(CURRENT_DATE) - 1
-    AND YEAR(p.dataPedido) = YEAR(CURRENT_DATE)
-GROUP BY 
-    fp.forma_pagamento;
